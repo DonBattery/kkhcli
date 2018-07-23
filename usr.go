@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	// "time"
 	"bytes"
 	"io/ioutil"
 	"log"
@@ -11,14 +10,50 @@ import (
 	"os"
 )
 
+type Response struct {
+	Msg string `json:"msg"`
+}
+
 type User struct {
 	Username string `json:"username"`
-	Enabled bool `json:"enabled"`
+}
+
+type Collection struct {
+	Name string `json:"name"`
 }
 
 func connErr(msg string) {
 	fmt.Println("\n", msg, "\n")
 	os.Exit(3)
+}
+
+func flushColllection(collectionToFlush string) Response {
+	type Message struct {
+		Command string
+		Collection string
+	}	
+	m := Message{"flush", collectionToFlush}
+	fmt.Println(m)
+	b, err := json.Marshal(m)
+	if err != nil {
+		connErr("JSON Error")		
+	}
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(b))
+	req.Header.Set("adminpassword", envPass)
+	req.Header.Set("Content-Type", "application/json")	
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		connErr("cannot connect to " + apiURL)
+	}
+	defer resp.Body.Close()	
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		connErr("Caannot read response")
+	}	
+	msg:= Response{}
+	json.Unmarshal(body, &msg)
+	return msg	
 }
 
 func seedDB() Response {
@@ -29,12 +64,12 @@ func seedDB() Response {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-			panic(err)
+		connErr("cannot connect to " + apiURL)			
 	}
 	defer resp.Body.Close()	
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("Error reading data: %s\n", err)
+		connErr("Caannot read response")		
 	}	
 	msg:= Response{}
 	json.Unmarshal(body, &msg)
@@ -49,15 +84,15 @@ func getUsers(envPass string) []User {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		connErr("cannot connect to " + apiURL)
+		connErr("Cannot connect to " + apiURL)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("Error reading data: %s\n", err)
+		connErr("Cannot read response")
 	}	
 	if resp.StatusCode != 200 {
-		connErr("cannot connect to " + apiURL)
+		connErr("Error connecting to " + apiURL)
 	}
 	msg:= Response{}
 	json.Unmarshal(body, &msg)
@@ -67,6 +102,34 @@ func getUsers(envPass string) []User {
 	var users []User
 	json.Unmarshal(body, &users)
 	return users	
+}
+
+func getCollections(envPass string) []Collection {
+	var jsonStr = []byte(`{"Command":"collections"}`)
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonStr))
+	req.Header.Set("adminpassword", envPass)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		connErr("cannot connect to " + apiURL)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		connErr("Cannot read response")
+	}	
+	if resp.StatusCode != 200 {
+		connErr("Error connecting to " + apiURL)
+	}
+	msg:= Response{}
+	json.Unmarshal(body, &msg)
+	if msg.Msg == "you have no rights to do this" {
+		connErr("you have no rights to do this")
+	}
+	var collections []Collection
+	json.Unmarshal(body, &collections)
+	return collections
 }
 
 func addUser(envPass string, username string, password string) Response {	
