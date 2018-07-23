@@ -8,10 +8,10 @@ Simple admin CLI tool for KKHC APP
 Options:
   -a, --add string
     	Add user
-  -d, --disable string
-    	Disable user
-  -e, --enable string
-    	Enable user
+  -c, --collections
+    	List collections
+  -f, --flush string
+    	Flush collection
   -l, --list
     	List users
   -r, --reset string
@@ -20,5 +20,10 @@ Options:
     	Seed database
   -u, --url string
     	WEB URL (default "https://kkhc.eu/admin")
+```
+
+You can flush multiple collection atonce by separating their names with commas (,)
+```SHELL
+kkhcli -f CommentFlow,Folder,Image
 ```
 
