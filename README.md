@@ -2,18 +2,23 @@
 
 Simple admin CLI tool for KKHC APP
 
-List users
--l
+### Usage: kkhcli \[option\] \[username\]
 
-Add user
--a username
-
-Reset password
--r username
-
-Disable user
--d username
-
-Enable user
--e username
+```SHELL
+Options:
+  -a, --add string
+    	Add user
+  -d, --disable string
+    	Disable user
+  -e, --enable string
+    	Enable user
+  -l, --list
+    	List users
+  -r, --reset string
+    	Reset password
+  -s, --seed
+    	Seed database
+  -u, --url string
+    	WEB URL (default "https://kkhc.eu/admin")
+```
 
