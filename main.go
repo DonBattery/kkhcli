@@ -43,7 +43,7 @@ func main() {
 	}
 	
 	if list {
-		users := getUsers(envPass)
+		users := getUsers()
 		fmt.Println("\nList of Users\n")
 		for _, u := range users {
 			fmt.Println(u.Username)
@@ -51,7 +51,7 @@ func main() {
 	}
 	
 	if listCollections {
-		collections := getCollections(envPass)
+		collections := getCollections()
 		fmt.Println("\nList of Collections\n")
 		for _, coll := range collections {
 			fmt.Println(coll.Name)
@@ -67,7 +67,7 @@ func main() {
 		if password == "" {
 			exit("No Password provided !")
 		} else {
-			response := addUser(envPass, userToAdd, password)
+			response := addUser(userToAdd, password)
 			fmt.Println(response.Msg, "\n")
 		}
 	}
@@ -81,7 +81,7 @@ func main() {
 		if password == "" {
 			exit("No Password provided !")
 		} else {
-			response := resetUser(envPass, userToReset, password)
+			response := resetUser(userToReset, password)
 			fmt.Println(response.Msg, "\n")
 		}
 	}

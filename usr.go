@@ -33,7 +33,6 @@ func flushColllection(collectionToFlush string) Response {
 		Collection string
 	}	
 	m := Message{"flush", collectionToFlush}
-	fmt.Println(m)
 	b, err := json.Marshal(m)
 	if err != nil {
 		connErr("JSON Error")		
@@ -76,7 +75,7 @@ func seedDB() Response {
 	return msg
 }
 
-func getUsers(envPass string) []User {
+func getUsers() []User {
 	var jsonStr = []byte(`{"Command":"list"}`)
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonStr))
 	req.Header.Set("adminpassword", envPass)
@@ -104,7 +103,7 @@ func getUsers(envPass string) []User {
 	return users	
 }
 
-func getCollections(envPass string) []Collection {
+func getCollections() []Collection {
 	var jsonStr = []byte(`{"Command":"collections"}`)
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonStr))
 	req.Header.Set("adminpassword", envPass)
@@ -132,7 +131,7 @@ func getCollections(envPass string) []Collection {
 	return collections
 }
 
-func addUser(envPass string, username string, password string) Response {	
+func addUser(username string, password string) Response {	
 	type Message struct {
 		Command string
     Username string
@@ -161,7 +160,7 @@ func addUser(envPass string, username string, password string) Response {
 	return msg
 }
 
-func resetUser(envPass string, username string, password string) Response {	
+func resetUser(username string, password string) Response {	
 	type Message struct {
 		Command string
     Username string
