@@ -131,13 +131,14 @@ func getCollections() []Collection {
 	return collections
 }
 
-func addUser(username string, password string) Response {	
+func addUser(username string, password string, email string) Response {	
 	type Message struct {
 		Command string
     Username string
-    Password string
+		Password string
+		Email string
 	}	
-	m := Message{"add", username, password}
+	m := Message{"add", username, password, email}
 	b, err := json.Marshal(m)
 	if err != nil {
 		panic(err)		

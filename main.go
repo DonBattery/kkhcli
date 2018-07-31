@@ -5,10 +5,12 @@ import (
 	"os"
 	"bufio"
 	"strings"
+	"regexp"
 	flag "github.com/ogier/pflag"
 )
 
 var (
+	dev bool
 	list bool
 	listCollections bool
 	seed bool
@@ -26,13 +28,15 @@ func main() {
 		printUsage()
 	}
 
+	if dev {
+		apiURL = "http://localhost:3099/admin"
+		fmt.Println("\nDevelopment mode\napiURL set to http://localhost:3099/admin\n")
+	}
+
 	envPass = os.Getenv("ADMIN_PASSWORD")
 	if envPass == "" {
 		fmt.Println("\nNo ADMIN_PASSWORD found in the environment\n")
-		fmt.Print("Admin password : ")
-		reader := bufio.NewReader(os.Stdin)
-		envPass, _ = reader.ReadString('\n')
-		envPass = strings.TrimSuffix(envPass, "\n")
+		envPass = getInput("Admin password : ")
 		fmt.Println()
 	}
 	
@@ -60,26 +64,24 @@ func main() {
 	
 	if userToAdd != "" {
 		fmt.Println("User to add :", userToAdd)
-		fmt.Print("Password : ")
-		reader := bufio.NewReader(os.Stdin)
-		password, _ := reader.ReadString('\n')
-		password = strings.TrimSuffix(password, "\n")
-		if password == "" {
-			exit("No Password provided !")
+		password := getInput("Password :")
+		if !isValidPassword(password) {
+			exit("Invalid password !\nit must be et least 6 character long")
 		} else {
-			response := addUser(userToAdd, password)
+			email := getInput("Email address :")
+			if !isValidEmail(email) {
+				exit("Invalid Email address")
+			}
+			response := addUser(userToAdd, password, email)
 			fmt.Println(response.Msg, "\n")
 		}
 	}
 		
 	if userToReset != "" {
 		fmt.Println("User to reset :", userToReset)
-		fmt.Print("New Password : ")
-		reader := bufio.NewReader(os.Stdin)
-		password, _ := reader.ReadString('\n')
-		password = strings.TrimSuffix(password, "\n")
-		if password == "" {
-			exit("No Password provided !")
+		password := getInput("New Password :")
+		if !isValidPassword(password) {
+			exit("Invalid password")
 		} else {
 			response := resetUser(userToReset, password)
 			fmt.Println(response.Msg, "\n")
@@ -97,6 +99,7 @@ func main() {
 }
 		
 func init() {
+	flag.BoolVarP(&dev, "dev", "d", false, "Development Mode")
 	flag.BoolVarP(&list, "list", "l", false, "List users")
 	flag.BoolVarP(&seed, "seed", "s", false, "Seed database")
 	flag.BoolVarP(&listCollections, "collections", "c", false, "List collections")
@@ -112,10 +115,33 @@ func printUsage() {
 	fmt.Println("Options:")
 	flag.PrintDefaults()
 	fmt.Println()
+	fmt.Println("All password must be et least 6 characters long\n")
+	fmt.Println("All Email address should be in legal format")
+	fmt.Println("for example: foo@bar.baz\n")
+	fmt.Println("You can flush multiple Collections at once by separating them with a single comma ,")
+	fmt.Println("for example: kkhcli -f Folder,Tag,Image\n")
+	fmt.Println("You can chain boolean type options in a single flag")
+	fmt.Println("for example: kkhcli -dlc\n")
 	os.Exit(1)
 }
 
 func exit(msg string) {
 	fmt.Println("\n Error :", msg, "\n")
 	os.Exit(2)
-} 
+}
+
+func getInput(msg string) string {
+	fmt.Print(msg)
+	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+	return strings.TrimSuffix(input, "\n")
+}
+
+func isValidPassword(pass string) bool {
+	return regexp.MustCompile(`\w{6,}`).MatchString(pass)
+}
+
+
+func isValidEmail(email string) bool {
+	return regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$").MatchString(email)
+}
