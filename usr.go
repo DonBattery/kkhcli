@@ -1,12 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"fmt"
 	"os"
 )
 
@@ -29,48 +29,39 @@ func connErr(msg string) {
 
 func flushColllection(collectionToFlush string) Response {
 	type Message struct {
-		Command string
+		Command    string
 		Collection string
-	}	
+	}
 	m := Message{"flush", collectionToFlush}
 	b, err := json.Marshal(m)
 	if err != nil {
-		connErr("JSON Error")		
+		connErr("JSON Error")
 	}
-	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(b))
-	req.Header.Set("adminpassword", envPass)
-	req.Header.Set("Content-Type", "application/json")	
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	body, err := AJAX("POST", apiURL, b, HTTPHeaderJSON)
 	if err != nil {
-		connErr("cannot connect to " + apiURL)
+		connErr(err.Error())
 	}
-	defer resp.Body.Close()	
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		connErr("Caannot read response")
-	}	
-	msg:= Response{}
+	msg := Response{}
 	json.Unmarshal(body, &msg)
-	return msg	
+	return msg
 }
 
 func seedDB() Response {
 	var jsonStr = []byte(`{"Command":"seed"}`)
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonStr))
 	req.Header.Set("adminpassword", envPass)
-	req.Header.Set("Content-Type", "application/json")	
+	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		connErr("cannot connect to " + apiURL)			
+		connErr("cannot connect to " + apiURL)
 	}
-	defer resp.Body.Close()	
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		connErr("Caannot read response")		
-	}	
-	msg:= Response{}
+		connErr("Caannot read response")
+	}
+	msg := Response{}
 	json.Unmarshal(body, &msg)
 	return msg
 }
@@ -89,18 +80,18 @@ func getUsers() []User {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		connErr("Cannot read response")
-	}	
+	}
 	if resp.StatusCode != 200 {
 		connErr("Error connecting to " + apiURL)
 	}
-	msg:= Response{}
+	msg := Response{}
 	json.Unmarshal(body, &msg)
 	if msg.Msg == "you have no rights to do this" {
 		connErr("you have no rights to do this")
 	}
 	var users []User
 	json.Unmarshal(body, &users)
-	return users	
+	return users
 }
 
 func getCollections() []Collection {
@@ -117,11 +108,11 @@ func getCollections() []Collection {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		connErr("Cannot read response")
-	}	
+	}
 	if resp.StatusCode != 200 {
 		connErr("Error connecting to " + apiURL)
 	}
-	msg:= Response{}
+	msg := Response{}
 	json.Unmarshal(body, &msg)
 	if msg.Msg == "you have no rights to do this" {
 		connErr("you have no rights to do this")
@@ -131,61 +122,61 @@ func getCollections() []Collection {
 	return collections
 }
 
-func addUser(username string, password string, email string) Response {	
+func addUser(username string, password string, email string) Response {
 	type Message struct {
-		Command string
-    Username string
+		Command  string
+		Username string
 		Password string
-		Email string
-	}	
+		Email    string
+	}
 	m := Message{"add", username, password, email}
 	b, err := json.Marshal(m)
 	if err != nil {
-		panic(err)		
+		panic(err)
 	}
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(b))
 	req.Header.Set("adminpassword", envPass)
-	req.Header.Set("Content-Type", "application/json")	
+	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
-	defer resp.Body.Close()	
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Error reading data: %s\n", err)
-	}	
-	msg:= Response{}
+	}
+	msg := Response{}
 	json.Unmarshal(body, &msg)
 	return msg
 }
 
-func resetUser(username string, password string) Response {	
+func resetUser(username string, password string) Response {
 	type Message struct {
-		Command string
-    Username string
-    Password string
-	}	
+		Command  string
+		Username string
+		Password string
+	}
 	m := Message{"reset", username, password}
 	b, err := json.Marshal(m)
 	if err != nil {
-		panic(err)		
+		panic(err)
 	}
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(b))
 	req.Header.Set("adminpassword", envPass)
-	req.Header.Set("Content-Type", "application/json")	
+	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
-	defer resp.Body.Close()	
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Error reading data: %s\n", err)
-	}	
-	msg:= Response{}
+	}
+	msg := Response{}
 	json.Unmarshal(body, &msg)
 	return msg
 }
