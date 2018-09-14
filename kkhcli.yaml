@@ -1,0 +1,8 @@
+---
+
+# KKHCLI Config
+
+adminPass : asd123
+apiURL : http://localhost:3099/admin
+
+...
