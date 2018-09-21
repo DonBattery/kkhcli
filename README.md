@@ -27,10 +27,10 @@ Note that these variables can be set with kkhcli.yaml < env < flag
 ```
 
 Available Commands:\
-**avatar**      Root command of Avatars. Subcommands: list add seed\
+**avatar**      Root command of Avatars.     Subcommands: list add seed\
 **collection**  Root command of Collections. Subcommands: list flush seed\
-**help**        Help about any command\
-**user**        Root command of Users. Subcommands: list add reset
+**user**        Root command of Users.       Subcommands: list add reset\
+**help**        Help about any command
 
 Flags:\
   -p, --adminPass string   Admin Password\
