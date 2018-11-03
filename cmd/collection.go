@@ -10,9 +10,12 @@ import (
 var collectionCmd = &cobra.Command{
 	Use:     "collection",
 	Aliases: []string{"coll", "col", "c"},
-	Short:   "Root command of Collections",
+	Short:   "Root command of Collections. Subcommands: list, flush, seed",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(`Usage: 
+		fmt.Println(`
+Root command of Collections. Subcommands: list, flush, seed
+
+Usage: 
 kkhcli collection [options]
 
 Example:

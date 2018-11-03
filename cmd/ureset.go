@@ -19,6 +19,7 @@ var UresetCmd = &cobra.Command{
 	Short:   "Resets given user's password",
 	Long: `
 Reset given user's password
+
 Usage:
 kkhcli user reset [...emailaddress]
 
