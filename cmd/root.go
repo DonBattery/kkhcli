@@ -9,7 +9,7 @@ var RootCmd = &cobra.Command{
 	Use:   "kkhcli",
 	Short: "KKHCLI is an admin tool for the KKHC Server",
 	Long: `
-	KKHCLI is an admin tool for the KKHC Server
+KKHCLI is an admin tool for the KKHC Server
 
 With thel help of KKHCLI you can list, add, remove
 users, collections, avatars. And you can seed the KKHC database as well
