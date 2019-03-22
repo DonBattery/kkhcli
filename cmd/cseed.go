@@ -21,6 +21,7 @@ var cseedCmd = &cobra.Command{
 			log.Fatalf("Error processing command\n%v\n", err)
 		}
 		if err := json.Unmarshal(resp, &msg); err != nil {
+			fmt.Printf("\n%v\n", msg)
 			log.Fatalf("Error decodig message %v\n", err)
 		}
 		fmt.Println(msg.Msg)

@@ -5,7 +5,7 @@
 # https://gist.github.com/asukakenji/f15ba7e588ac42795f421b48b8aede63
 
 Architecture="amd64"
-OS="darwin"
+OS="linux"
 
 
 echo "Building KKHCLI..."

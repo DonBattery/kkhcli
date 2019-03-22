@@ -2,7 +2,7 @@
 
 # KKHCLI Config
 
-adminPass : asd123
-apiURL : http://localhost:3099/admin
+adminPass : bigiribazdmeg
+apiURL : https://kkhc.eu/admin
 
 ...
